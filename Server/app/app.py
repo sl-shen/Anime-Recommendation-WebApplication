@@ -10,7 +10,7 @@ pydantic.json.ENCODERS_BY_TYPE[ObjectId]=str
 import torch
 import torch.nn as nn
 import numpy as np
-
+import pandas as pd
 
 load_dotenv()
 
@@ -74,11 +74,11 @@ class CollaborativeFilteringModel(nn.Module):
     
 # loaded model for tv anime
 model_TV = CollaborativeFilteringModel(num_users=268584, num_animes=12321, embedding_size=128)
-model_TV.load_state_dict(torch.load('./modeles/tv_model_weights.pth', map_location=torch.device('cpu')))
+model_TV.load_state_dict(torch.load('../models/tv_model_weights.pth', map_location=torch.device('cpu')))
 model_TV.eval()
 # loaded model for movie anime
 model_Movie = CollaborativeFilteringModel(num_users=183380, num_animes=2685, embedding_size=128)
-model_Movie.load_state_dict(torch.load('./modeles/movie_model_weights.pth', map_location=torch.device('cpu')))
+model_Movie.load_state_dict(torch.load('../models/movie_model_weights.pth', map_location=torch.device('cpu')))
 model_Movie.eval()
 
 # function to extract weight
@@ -104,3 +104,7 @@ tv_anime_weights = extract_weights(model_TV.anime_embedding)
 tv_user_weights = extract_weights(model_TV.user_embedding)
 movie_anime_weights = extract_weights(model_Movie.anime_embedding)
 movie_user_weights = extract_weights(model_Movie.user_embedding)
+
+# load dataset
+combined_TV_anime = pd.read_csv("./dataset/combined_TV_anime.csv")
+Movie_anime = pd.read_csv("./dataset/Movie_anime.csv")
