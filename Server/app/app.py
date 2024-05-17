@@ -99,35 +99,8 @@ app.on_event("startup")
 async def load_model():
     print("Models loaded and ready to use.")
 
-# endpoints to extract weights from models
-@app.get("/weights/tv/anime")
-async def get_anime_weights():
-    try:
-        weights = extract_weights(model_TV.anime_embedding)
-        return {"anime_weights": weights.tolist()}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/weights/tv/user")
-async def get_user_weights():
-    try:
-        weights = extract_weights(model_TV.user_embedding)
-        return {"user_weights": weights.tolist()}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-@app.get("/weights/movie/anime")
-async def get_anime_weights():
-    try:
-        weights = extract_weights(model_Movie.anime_embedding)
-        return {"anime_weights": weights.tolist()}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/weights/movie/user")
-async def get_user_weights():
-    try:
-        weights = extract_weights(model_Movie.user_embedding)
-        return {"user_weights": weights.tolist()}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# load weights from models
+tv_anime_weights = extract_weights(model_TV.anime_embedding)
+tv_user_weights = extract_weights(model_TV.user_embedding)
+movie_anime_weights = extract_weights(model_Movie.anime_embedding)
+movie_user_weights = extract_weights(model_Movie.user_embedding)
