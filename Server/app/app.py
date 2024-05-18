@@ -11,6 +11,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 
 load_dotenv()
 
@@ -50,6 +51,8 @@ async def get_anime(anime_id: int):
     if anime:
         return anime
     raise HTTPException(status_code=404, detail="Anime not found")
+
+
 
 # define model structure
 class CollaborativeFilteringModel(nn.Module):
@@ -105,6 +108,8 @@ tv_user_weights = extract_weights(model_TV.user_embedding)
 movie_anime_weights = extract_weights(model_Movie.anime_embedding)
 movie_user_weights = extract_weights(model_Movie.user_embedding)
 
-# load dataset
-combined_TV_anime = pd.read_csv("./dataset/combined_TV_anime.csv")
-Movie_anime = pd.read_csv("./dataset/Movie_anime.csv")
+# load encoder
+tv_user_encoder = LabelEncoder()
+tv_anime_encoder = LabelEncoder()
+movie_user_encoder = LabelEncoder()
+movie_anime_encoder = LabelEncoder()
