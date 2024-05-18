@@ -41,17 +41,38 @@ app.add_middleware(
 async def read_root() -> dict:
     return {"message": "Welcome to your todo list."}
 
-# endpoint to retrieve anime info from database
-@app.get("/anime/{anime_id}", tags=["anime"])
-async def get_anime(anime_id: int):
-    anime = await Movie_anime_collection.find_one({"anime_id": anime_id}, {'_id': 0})
-    if anime is not None:
-        return anime
+# endpoint to retrieve tv_anime info from database via id
+@app.get("/anime_id/tv/{anime_id}", tags=["anime"])
+async def get_TV_anime_by_id(anime_id: int):
     anime = await TV_anime_collection.find_one({"anime_id": anime_id})
     if anime:
         return anime
-    raise HTTPException(status_code=404, detail="Anime not found")
+    raise HTTPException(status_code=404, detail="Anime TV not found")
 
+# endpoint to retrieve movie_anime info from database via id
+@app.get("/anime_id/movie/{anime_id}", tags=["anime"])
+async def get_movie_anime_by_id(anime_id: int):
+    anime = await Movie_anime_collection.find_one({"anime_id": anime_id})
+    if anime is not None:
+        return anime
+    raise HTTPException(status_code=404, detail="Anime Movie not found")
+
+
+# endpoint to retrieve tv_anime info from database via name (case insensitive)
+@app.get("/anime_name/tv/{anime_name}", tags=["anime"])
+async def get_TV_anime_by_name(anime_name: str):
+    anime = await TV_anime_collection.find_one({"Name": {"$regex": f"^{anime_name}$", "$options": "i"}})
+    if anime:
+        return anime
+    raise HTTPException(status_code=404, detail="Anime TV not found")
+
+# endpoint to retrieve movie_anime info from database via name (case insensitive)
+@app.get("/anime_name/movie/{anime_name}", tags=["anime"])
+async def get_movie_anime_by_name(anime_name: str):
+    anime = await Movie_anime_collection.find_one({"Name": {"$regex": f"^{anime_name}$", "$options": "i"}})
+    if anime is not None:
+        return anime
+    raise HTTPException(status_code=404, detail="Anime Movie not found")
 
 
 # define model structure
