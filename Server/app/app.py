@@ -107,10 +107,6 @@ TV_anime_collection = db.get_collection("TV_anime")
 async def startup_event():
     tv_anime_data = await TV_anime_collection.find().to_list(None)  # Adjust query as needed
     all_anime_ids = [anime['anime_id'] for anime in tv_anime_data]
-
-    if 3086 not in all_anime_ids:
-        print("Anime ID 3086 is missing from the dataset fetched during startup.")
-        
     tv_anime_encoder.fit(all_anime_ids)
 
 
@@ -136,6 +132,7 @@ async def get_movie_anime_by_id(anime_id: int):
 async def get_TV_anime_by_name(anime_name: str):
     anime = await TV_anime_collection.find_one({"Name": {"$regex": f"^{anime_name}$", "$options": "i"}})
     if anime:
+        anime['anime_id'] = int(anime['anime_id'])
         return anime
     raise HTTPException(status_code=404, detail="Anime TV not found")
 
@@ -153,7 +150,7 @@ async def get_movie_anime_by_name(anime_name: str):
 async def find_similar_animes_tv(anime_name: str, n: int = 10, return_dist: bool = False, neg: bool = False):
     try:
         anime_row = await get_TV_anime_by_name(anime_name)
-        index = anime_row['anime_id']
+        index = int(anime_row['anime_id'])
         print(f"Encoding ID: {index}, Type: {type(index)}")
         encoded_index = tv_anime_encoder.transform([index])[0]
         weights = tv_anime_weights
@@ -164,16 +161,16 @@ async def find_similar_animes_tv(anime_name: str, n: int = 10, return_dist: bool
 
         similarity_arr = []
         for close in closest:
-            decoded_id = tv_anime_encoder.inverse_transform([close])[0]
+            decoded_id = int(tv_anime_encoder.inverse_transform([close])[0])
             anime_frame = await get_TV_anime_by_id(decoded_id)
-            if anime_frame.empty:
+            if anime_frame is None:
                 continue
             
-            anime_name = anime_frame['Name'].values[0]
-            english_name = anime_frame['English name'].values[0]
+            anime_name = anime_frame['Name']
+            english_name = anime_frame.get('English name', 'UNKNOWN')
             name = english_name if english_name != "UNKNOWN" else anime_name
-            genre = anime_frame['Genres'].values[0]
-            synopsis = anime_frame['Synopsis'].values[0]
+            genre = anime_frame.get('Genres', '')
+            synopsis = anime_frame.get('Synopsis', '')
             similarity = dists[close]
             similarity = "{:.2f}%".format(similarity * 100)
 
