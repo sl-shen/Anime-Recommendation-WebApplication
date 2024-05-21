@@ -109,6 +109,10 @@ async def startup_event():
     all_anime_ids = [anime['anime_id'] for anime in tv_anime_data]
     tv_anime_encoder.fit(all_anime_ids)
 
+    movie_anime_data = await Movie_anime_collection.find().to_list(None)  # Adjust query as needed
+    all_movie_anime_ids = [anime['anime_id'] for anime in movie_anime_data]
+    movie_anime_encoder.fit(all_movie_anime_ids)
+
 
 # endpoint to retrieve tv_anime info from database via id
 @app.get("/anime_id/tv/{anime_id}", tags=["anime"])
@@ -122,7 +126,7 @@ async def get_TV_anime_by_id(anime_id: int):
 @app.get("/anime_id/movie/{anime_id}", tags=["anime"])
 async def get_movie_anime_by_id(anime_id: int):
     anime = await Movie_anime_collection.find_one({"anime_id": anime_id})
-    if anime is not None:
+    if anime:
         return anime
     raise HTTPException(status_code=404, detail="Anime Movie not found")
 
@@ -140,7 +144,8 @@ async def get_TV_anime_by_name(anime_name: str):
 @app.get("/anime_name/movie/{anime_name}", tags=["anime"])
 async def get_movie_anime_by_name(anime_name: str):
     anime = await Movie_anime_collection.find_one({"Name": {"$regex": f"^{anime_name}$", "$options": "i"}})
-    if anime is not None:
+    if anime:
+        anime['anime_id'] = int(anime['anime_id'])
         return anime
     raise HTTPException(status_code=404, detail="Anime Movie not found")
 
@@ -180,5 +185,40 @@ async def find_similar_animes_tv(anime_name: str, n: int = 10, return_dist: bool
         return [anime for anime in similarity_arr if anime['Name'].lower() != anime_name.lower()]
     except Exception as e:
         raise HTTPException(status_code=404, detail=f'{anime_name} not found in Anime list. Error: {str(e)}')
-    
+
+# endpoint to get similar movie_anime
+@app.get("/similar-animes-movie/{anime_name}")
+async def find_similar_animes_movie(anime_name: str, n: int = 10, return_dist: bool = False, neg: bool = False):
+    try:
+        anime_row = await get_movie_anime_by_name(anime_name)
+        index = int(anime_row['anime_id'])
+        print(f"Encoding ID: {index}, Type: {type(index)}")
+        encoded_index = movie_anime_encoder.transform([index])[0]
+        weights = movie_anime_weights
+        dists = np.dot(weights, weights[encoded_index])
+        sorted_dists = np.argsort(dists)
+        n = n + 1
+        closest = sorted_dists[:n] if neg else sorted_dists[-n:]
+
+        similarity_arr = []
+        for close in closest:
+            decoded_id = int(movie_anime_encoder.inverse_transform([close])[0])
+            anime_frame = await get_movie_anime_by_id(decoded_id)
+            if anime_frame is None:
+                continue
+            
+            anime_name = anime_frame['Name']
+            english_name = anime_frame.get('English name', 'UNKNOWN')
+            name = english_name if english_name != "UNKNOWN" else anime_name
+            genre = anime_frame.get('Genres', '')
+            synopsis = anime_frame.get('Synopsis', '')
+            similarity = dists[close]
+            similarity = "{:.2f}%".format(similarity * 100)
+
+            similarity_arr.append({"Name": name, "Similarity": similarity, "Genres": genre, "Synopsis": synopsis})
+
+        similarity_arr = sorted(similarity_arr, key=lambda x: x['Similarity'], reverse=True)
+        return [anime for anime in similarity_arr if anime['Name'].lower() != anime_name.lower()]
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f'{anime_name} not found in Anime list. Error: {str(e)}')
     
