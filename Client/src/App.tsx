@@ -1,35 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import axios from 'axios';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [animeName, setAnimeName] = useState('');
+  const [recommendations, setRecommendations] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleInputChange = (event) => {
+    setAnimeName(event.target.value);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await axios.get(`http://127.0.0.1:8000/similar-animes-tv/${animeName}`);
+      setRecommendations(response.data);
+    } catch (error) {
+      setError('Anime not found. Please try again.');
+    }
+
+    setIsLoading(false);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div>
+      <h1>Anime Recommender</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={animeName}
+          onChange={handleInputChange}
+          placeholder="Enter anime name"
+        />
+        <button type="submit">Get Recommendations</button>
+      </form>
 
-export default App
+      {isLoading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
+
+      {recommendations.length > 0 && (
+        <div>
+          <h2>Recommended Animes:</h2>
+          <ul>
+            {recommendations.map((anime, index) => (
+              <li key={index}>
+                <h3>{anime.Name}</h3>
+                <p>Similarity: {anime.Similarity}</p>
+                <p>Genres: {anime.Genres}</p>
+                <p>Synopsis: {anime.Synopsis}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default App;

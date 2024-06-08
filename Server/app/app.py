@@ -20,8 +20,8 @@ app = FastAPI()
 
 
 origins = [
-    "http://localhost:3000",
-    "localhost:3000"
+    "http://localhost:5173",
+    "localhost:5173"
 ]
 
 
@@ -182,7 +182,9 @@ async def find_similar_animes_tv(anime_name: str, n: int = 10, return_dist: bool
             similarity_arr.append({"Name": name, "Similarity": similarity, "Genres": genre, "Synopsis": synopsis})
 
         similarity_arr = sorted(similarity_arr, key=lambda x: x['Similarity'], reverse=True)
+        
         return [anime for anime in similarity_arr if anime['Name'].lower() != anime_name.lower()]
+        
     except Exception as e:
         raise HTTPException(status_code=404, detail=f'{anime_name} not found in Anime list. Error: {str(e)}')
 
