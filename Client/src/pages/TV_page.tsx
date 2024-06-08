@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const TV = () => {
   const [animeName, setAnimeName] = useState('');
@@ -58,6 +59,7 @@ const TV = () => {
         </div>
       )}
       
+      <Link to="/">Go back to Home</Link>
     </div>
   );
 };
