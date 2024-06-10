@@ -12,6 +12,7 @@ import torch.nn as nn
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
+from urllib.parse import unquote
 
 load_dotenv()
 
@@ -115,7 +116,7 @@ async def startup_event():
 
 
 # endpoint to retrieve tv_anime info from database via id
-@app.get("/anime_id/tv/{anime_id}", tags=["anime"])
+@app.get("/anime_id/tv/{anime_id}", tags=["tv_anime"])
 async def get_TV_anime_by_id(anime_id: int):
     anime = await TV_anime_collection.find_one({"anime_id": anime_id})
     if anime:
@@ -123,7 +124,7 @@ async def get_TV_anime_by_id(anime_id: int):
     raise HTTPException(status_code=404, detail="Anime TV not found")
 
 # endpoint to retrieve movie_anime info from database via id
-@app.get("/anime_id/movie/{anime_id}", tags=["anime"])
+@app.get("/anime_id/movie/{anime_id}", tags=["movie_anime"])
 async def get_movie_anime_by_id(anime_id: int):
     anime = await Movie_anime_collection.find_one({"anime_id": anime_id})
     if anime:
@@ -132,7 +133,7 @@ async def get_movie_anime_by_id(anime_id: int):
 
 
 # endpoint to retrieve tv_anime info from database via name (case insensitive)
-@app.get("/anime_name/tv/{anime_name}", tags=["anime"])
+@app.get("/anime_name/tv/{anime_name}", tags=["tv_anime"])
 async def get_TV_anime_by_name(anime_name: str):
     anime = await TV_anime_collection.find_one({"Name": {"$regex": f"^{anime_name}$", "$options": "i"}})
     if anime:
@@ -140,19 +141,29 @@ async def get_TV_anime_by_name(anime_name: str):
         return anime
     raise HTTPException(status_code=404, detail="Anime TV not found")
 
-# endpoint to retrieve tv_anime info from database via name (case insensitive)
-@app.get("/anime_name/tv/{anime_eng_name}", tags=["anime"])
+# endpoint to retrieve tv_anime info from database via English name (case insensitive)
+@app.get("/anime_eng_name/tv/{anime_eng_name}", tags=["tv_anime"])
 async def get_TV_anime_by_eng_name(anime_eng_name: str):
-    anime = await TV_anime_collection.find_one({"English Name": {"$regex": f"^{anime_eng_name}$", "$options": "i"}})
+    anime = await TV_anime_collection.find_one({"English name": {"$regex": f"^{anime_eng_name}$", "$options": "i"}})
     if anime:
         anime['anime_id'] = int(anime['anime_id'])
         return anime
     raise HTTPException(status_code=404, detail="Anime TV not found")
 
+
 # endpoint to retrieve movie_anime info from database via name (case insensitive)
-@app.get("/anime_name/movie/{anime_name}", tags=["anime"])
+@app.get("/anime_name/movie/{anime_name}", tags=["movie_anime"])
 async def get_movie_anime_by_name(anime_name: str):
     anime = await Movie_anime_collection.find_one({"Name": {"$regex": f"^{anime_name}$", "$options": "i"}})
+    if anime:
+        anime['anime_id'] = int(anime['anime_id'])
+        return anime
+    raise HTTPException(status_code=404, detail="Anime Movie not found")
+
+# endpoint to retrieve movie_anime info from database via English name (case insensitive)
+@app.get("/anime_eng_name/movie/{anime_eng_name}", tags=["movie_anime"])
+async def get_movie_anime_by_eng_name(anime_eng_name: str):
+    anime = await Movie_anime_collection.find_one({"English name": {"$regex": f"^{anime_eng_name}$", "$options": "i"}})
     if anime:
         anime['anime_id'] = int(anime['anime_id'])
         return anime
