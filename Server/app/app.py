@@ -221,6 +221,9 @@ async def find_similar_animes_tv(anime_name: str, n: int = 10, return_dist: bool
 async def find_similar_animes_movie(anime_name: str, n: int = 10, return_dist: bool = False, neg: bool = False):
     try:
         anime_row = await get_movie_anime_by_name(anime_name)
+        if anime_row is None:
+            anime_row = await get_movie_anime_by_eng_name(anime_name)
+
         index = int(anime_row['anime_id'])
         print(f"Encoding ID: {index}, Type: {type(index)}")
         encoded_index = movie_anime_encoder.transform([index])[0]
