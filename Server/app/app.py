@@ -140,6 +140,15 @@ async def get_TV_anime_by_name(anime_name: str):
         return anime
     raise HTTPException(status_code=404, detail="Anime TV not found")
 
+# endpoint to retrieve tv_anime info from database via name (case insensitive)
+@app.get("/anime_name/tv/{anime_eng_name}", tags=["anime"])
+async def get_TV_anime_by_eng_name(anime_eng_name: str):
+    anime = await TV_anime_collection.find_one({"English Name": {"$regex": f"^{anime_eng_name}$", "$options": "i"}})
+    if anime:
+        anime['anime_id'] = int(anime['anime_id'])
+        return anime
+    raise HTTPException(status_code=404, detail="Anime TV not found")
+
 # endpoint to retrieve movie_anime info from database via name (case insensitive)
 @app.get("/anime_name/movie/{anime_name}", tags=["anime"])
 async def get_movie_anime_by_name(anime_name: str):
