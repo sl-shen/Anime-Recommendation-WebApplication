@@ -121,7 +121,8 @@ async def get_TV_anime_by_id(anime_id: int):
     anime = await TV_anime_collection.find_one({"anime_id": anime_id})
     if anime:
         return anime
-    raise HTTPException(status_code=404, detail="Anime TV not found")
+    else:
+        return None
 
 # endpoint to retrieve movie_anime info from database via id
 @app.get("/anime_id/movie/{anime_id}", tags=["movie_anime"])
@@ -129,8 +130,8 @@ async def get_movie_anime_by_id(anime_id: int):
     anime = await Movie_anime_collection.find_one({"anime_id": anime_id})
     if anime:
         return anime
-    raise HTTPException(status_code=404, detail="Anime Movie not found")
-
+    else:
+        return None
 
 # endpoint to retrieve tv_anime info from database via name (case insensitive)
 @app.get("/anime_name/tv/{anime_name}", tags=["tv_anime"])
@@ -139,7 +140,8 @@ async def get_TV_anime_by_name(anime_name: str):
     if anime:
         anime['anime_id'] = int(anime['anime_id'])
         return anime
-    raise HTTPException(status_code=404, detail="Anime TV not found")
+    else:
+        return None
 
 # endpoint to retrieve tv_anime info from database via English name (case insensitive)
 @app.get("/anime_eng_name/tv/{anime_eng_name}", tags=["tv_anime"])
@@ -148,7 +150,8 @@ async def get_TV_anime_by_eng_name(anime_eng_name: str):
     if anime:
         anime['anime_id'] = int(anime['anime_id'])
         return anime
-    raise HTTPException(status_code=404, detail="Anime TV not found")
+    else:
+        return None
 
 
 # endpoint to retrieve movie_anime info from database via name (case insensitive)
@@ -158,7 +161,8 @@ async def get_movie_anime_by_name(anime_name: str):
     if anime:
         anime['anime_id'] = int(anime['anime_id'])
         return anime
-    raise HTTPException(status_code=404, detail="Anime Movie not found")
+    else:
+        return None
 
 # endpoint to retrieve movie_anime info from database via English name (case insensitive)
 @app.get("/anime_eng_name/movie/{anime_eng_name}", tags=["movie_anime"])
@@ -167,7 +171,8 @@ async def get_movie_anime_by_eng_name(anime_eng_name: str):
     if anime:
         anime['anime_id'] = int(anime['anime_id'])
         return anime
-    raise HTTPException(status_code=404, detail="Anime Movie not found")
+    else:
+        return None
 
 
 # endpoint to get similar tv_anime
@@ -175,6 +180,9 @@ async def get_movie_anime_by_eng_name(anime_eng_name: str):
 async def find_similar_animes_tv(anime_name: str, n: int = 10, return_dist: bool = False, neg: bool = False):
     try:
         anime_row = await get_TV_anime_by_name(anime_name)
+        if anime_row is None:
+            anime_row = await get_TV_anime_by_eng_name(anime_name)
+
         index = int(anime_row['anime_id'])
         print(f"Encoding ID: {index}, Type: {type(index)}")
         encoded_index = tv_anime_encoder.transform([index])[0]
