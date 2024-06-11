@@ -1,15 +1,37 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { Hint } from 'react-autocomplete-hint';
 
 const Movie = () => {
   const [animeName, setAnimeName] = useState('');
   const [recommendations, setRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const handleInputChange = (event) => {
-    setAnimeName(event.target.value);
+  const handleInputChange = async (event) => {
+    const value = event.target.value;
+    setAnimeName(value);
+
+    if (value.length >= 2) {
+      try {
+        const response = await axios.get(`http://127.0.0.1:8000/autocomplete_movie?term=${encodeURIComponent(value)}`);
+        setSuggestions(response.data);
+        setShowSuggestions(true);
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+      }
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setAnimeName(suggestion);
+    setShowSuggestions(false);
   };
 
   const handleSubmit = async (event) => {
@@ -31,12 +53,29 @@ const Movie = () => {
     <div>
       <h1>Movie Anime Recommender</h1>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={animeName}
-          onChange={handleInputChange}
-          placeholder="Enter Movie anime name"
-        />
+        <div style={{ position: 'relative' }}>
+          <Hint options={suggestions} allowTabFill onHint={() => {}}>
+            <input
+              type="text"
+              value={animeName}
+              onChange={handleInputChange}
+              placeholder="Enter TV anime name"
+            />
+          </Hint>
+          {showSuggestions && (
+            <ul style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'white', listStyle: 'none', padding: 0, margin: 0 }}>
+              {suggestions.map((suggestion, index) => (
+                <li
+                  key={index}
+                  onClick={() => handleSuggestionClick(suggestion)}
+                  style={{ padding: '5px', cursor: 'pointer', color: 'black' }}
+                >
+                  {suggestion}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
         <button type="submit">Get Recommendations</button>
       </form>
 
