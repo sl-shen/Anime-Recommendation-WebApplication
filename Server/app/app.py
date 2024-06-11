@@ -174,10 +174,25 @@ async def get_movie_anime_by_eng_name(anime_eng_name: str):
     else:
         return None
 
-
+# autocomplete endpoint for tv anime
 @app.get("/autocomplete_tv")
 async def autocomplete_tv(term: str):
     animes = await TV_anime_collection.find(
+        {"$or": [
+            {"Name": {"$regex": term, "$options": "i"}},
+            {"English name": {"$regex": term, "$options": "i"}}
+        ]}
+    ).to_list(length=10)
+
+    names = [anime["Name"] for anime in animes]
+    eng_names = [anime["English name"] for anime in animes if "English name" in anime]
+
+    return list(set(names + eng_names))
+
+# autocomplete endpoint for movie anime
+@app.get("/autocomplete_movie")
+async def autocomplete_movie(term: str):
+    animes = await Movie_anime_collection.find(
         {"$or": [
             {"Name": {"$regex": term, "$options": "i"}},
             {"English name": {"$regex": term, "$options": "i"}}
