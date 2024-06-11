@@ -175,6 +175,21 @@ async def get_movie_anime_by_eng_name(anime_eng_name: str):
         return None
 
 
+@app.get("/autocomplete")
+async def autocomplete(term: str):
+    animes = await TV_anime_collection.find(
+        {"$or": [
+            {"Name": {"$regex": term, "$options": "i"}},
+            {"English name": {"$regex": term, "$options": "i"}}
+        ]}
+    ).to_list(length=10)
+
+    names = [anime["Name"] for anime in animes]
+    eng_names = [anime["English name"] for anime in animes if "English name" in anime]
+
+    return list(set(names + eng_names))
+
+
 # endpoint to get similar tv_anime
 @app.get("/similar-animes-tv/{anime_name}")
 async def find_similar_animes_tv(anime_name: str, n: int = 10, return_dist: bool = False, neg: bool = False):
