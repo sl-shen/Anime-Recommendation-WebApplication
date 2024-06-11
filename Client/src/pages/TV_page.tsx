@@ -17,7 +17,7 @@ const TV = () => {
 
     if (value.length >= 2) {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/autocomplete?term=${encodeURIComponent(value)}`);
+        const response = await axios.get(`http://127.0.0.1:8000/autocomplete_tv?term=${encodeURIComponent(value)}`);
         setSuggestions(response.data);
         setShowSuggestions(true);
       } catch (error) {
