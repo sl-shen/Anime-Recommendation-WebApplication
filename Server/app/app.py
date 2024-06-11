@@ -175,8 +175,8 @@ async def get_movie_anime_by_eng_name(anime_eng_name: str):
         return None
 
 
-@app.get("/autocomplete")
-async def autocomplete(term: str):
+@app.get("/autocomplete_tv")
+async def autocomplete_tv(term: str):
     animes = await TV_anime_collection.find(
         {"$or": [
             {"Name": {"$regex": term, "$options": "i"}},
