@@ -3,8 +3,8 @@ import * as crypto from 'crypto-js';
 
 // 配置信息
 const CLIENT_ID = 'c8645b434e72effbc3206f6757c2ec34';
-const CLIENT_SECRET = '9454a54aae85aacaca134687576ebea38f045121787bb2b6afed61a01791d500';
 const REDIRECT_URI = 'http://localhost:5173/mal_tv'; // 更改为你的实际回调 URL
+const BACKEND_URL = 'http://127.0.0.1:8000'; // 假设你的后端运行在8000端口
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -39,44 +39,22 @@ const MyAnimeListAuth: React.FC = () => {
     return `https://myanimelist.net/v1/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&code_challenge=${codeChallenge}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
   };
 
-  // 3. Generate new token
+  // 3. Generate new token (now using backend)
   const generateNewToken = async (authorisationCode: string, codeVerifier: string): Promise<any> => {
-    const url = 'https://myanimelist.net/v1/oauth2/token';
-    const data = {
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      code: authorisationCode,
-      code_verifier: codeVerifier,
-      grant_type: 'authorization_code',
-      redirect_uri: REDIRECT_URI,
-    };
-
+    const url = `${BACKEND_URL}/api/oauth/token`;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
-      body: new URLSearchParams(data),
+      body: JSON.stringify({
+        code: authorisationCode,
+        codeVerifier: codeVerifier,
+      }),
     });
 
     if (!response.ok) {
       throw new Error('Failed to exchange token');
-    }
-
-    return await response.json();
-  };
-
-  // 4. Test the API by requesting user profile information
-  const getUserInfo = async (accessToken: string): Promise<any> => {
-    const url = 'https://api.myanimelist.net/v2/users/@me';
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch user info');
     }
 
     return await response.json();
@@ -98,13 +76,12 @@ const MyAnimeListAuth: React.FC = () => {
     }
 
     try {
-      const token = await generateNewToken(code, codeVerifier);
-      const userInfo = await getUserInfo(token.access_token);
+      const data = await generateNewToken(code, codeVerifier);
 
       setAuthState({
         isAuthenticated: true,
-        accessToken: token.access_token,
-        userName: userInfo.name,
+        accessToken: data.access_token,
+        userName: data.user.name,
       });
 
       localStorage.removeItem('codeVerifier');
