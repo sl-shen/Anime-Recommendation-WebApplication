@@ -3,8 +3,8 @@ import * as crypto from 'crypto-js';
 
 // 配置信息
 const CLIENT_ID = 'c8645b434e72effbc3206f6757c2ec34';
-const REDIRECT_URI = 'http://localhost:5173/mal_tv'; // 更改为你的实际回调 URL
-const BACKEND_URL = 'http://127.0.0.1:8000'; // 假设你的后端运行在8000端口
+const REDIRECT_URI = 'http://localhost:5173/mal'; 
+const BACKEND_URL = 'http://127.0.0.1:8000';
 
 interface AuthState {
   isAuthenticated: boolean;

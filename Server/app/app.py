@@ -293,7 +293,7 @@ async def find_similar_animes_movie(anime_name: str, n: int = 10, return_dist: b
 
 CLIENT_ID = os.getenv("MAL_CLIENT_ID")
 CLIENT_SECRET = os.getenv("MAL_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:5173/mal_tv")
+REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:5173/mal")
 
 class TokenRequest(BaseModel):
     code: str

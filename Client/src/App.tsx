@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import TV from "./pages/TV_page";
 import Movie from "./pages/Movie_page";
-import Mal_TV from "./pages/Mal_TV_page";
-import Mal_Movie from "./pages/Mal_Movie_page";
+import Mal from "./pages/Mal_page";
+
 
 // Home component
 const Home: React.FC = () => {
@@ -19,10 +19,7 @@ const Home: React.FC = () => {
             <Link to="/movie">Movie Anime</Link>
           </li>
           <li>
-            <Link to="/mal_tv">MAL TV Anime</Link>
-          </li>
-          <li>
-            <Link to="/mal_movie">MAL Movie Anime</Link>
+            <Link to="/mal">MAL-based Recommendation</Link>
           </li>
         </ul>
       </nav>
@@ -39,8 +36,7 @@ const App: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/tv" element={<TV />} />
           <Route path="/movie" element={<Movie />} />
-          <Route path="/mal_tv" element={<Mal_TV />} />
-          <Route path="/mal_movie" element={<Mal_Movie />} />
+          <Route path="/mal" element={<Mal/>} />
         </Routes>
       </div>
     </Router>
