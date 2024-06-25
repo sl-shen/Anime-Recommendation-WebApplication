@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import TV from "./pages/TV_page";
 import Movie from "./pages/Movie_page";
 import Mal from "./pages/Mal_page";

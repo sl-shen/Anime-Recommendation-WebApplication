@@ -11,7 +11,7 @@ const AnimeRecommendations = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -81,18 +81,18 @@ const AnimeRecommendations = () => {
         </div>
       )}
 
-      {displayedRecommendations.length > 0 && (
-        <div>
-          <h3>Recommended Anime:</h3>
-          <ul>
-            {displayedRecommendations.map((anime, index) => (
-              <li key={index}>
-                {anime.title}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+    {displayedRecommendations.length > 0 && (
+      <div>
+        <h3>Recommended Anime:</h3>
+        <ul>
+          {displayedRecommendations.map((anime: any, index) => (
+            <li key={index}>
+              {anime.title}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
     </div>
   );
 };

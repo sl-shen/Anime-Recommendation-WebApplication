@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Hint } from 'react-autocomplete-hint';
@@ -13,7 +13,7 @@ const TV = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const handleInputChange = async (event) => {
+  const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setAnimeName(value);
 
@@ -31,12 +31,12 @@ const TV = () => {
     }
   };
 
-  const handleSuggestionClick = (suggestion) => {
+  const handleSuggestionClick = (suggestion: string) => {
     setAnimeName(suggestion);
     setShowSuggestions(false);
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
     setError('');
@@ -89,7 +89,7 @@ const TV = () => {
         <div>
           <h2>Recommended Animes:</h2>
           <ul>
-            {recommendations.map((anime, index) => (
+            {recommendations.map((anime: any, index) => (
               <li key={index}>
                 <h3>{anime.Name}</h3>
                 <p>Similarity: {anime.Similarity}</p>
@@ -99,7 +99,7 @@ const TV = () => {
             ))}
           </ul>
         </div>
-      )}
+)}
       
       <Link to="/">Go back to Home</Link>
     </div>
