@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Hint } from 'react-autocomplete-hint';
+import '../shared.css';
+import Layout from '../component/Layout';
 
 const TV = () => {
   const [animeName, setAnimeName] = useState('');
@@ -50,8 +52,9 @@ const TV = () => {
   };
 
   return (
-    <div>
-      <h2>TV Anime Recommender</h2>
+    <Layout>
+      <div>
+      <h1>TV Anime Recommender</h1>
       <form onSubmit={handleSubmit}>
         <div style={{ position: 'relative' }}>
           <Hint options={suggestions} allowTabFill onHint={() => {}}>
@@ -100,6 +103,8 @@ const TV = () => {
       
       <Link to="/">Go back to Home</Link>
     </div>
+    </Layout>
+    
   );
 };
 

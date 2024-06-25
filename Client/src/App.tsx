@@ -3,27 +3,18 @@ import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import TV from "./pages/TV_page";
 import Movie from "./pages/Movie_page";
 import Mal from "./pages/Mal_page";
-
+import './shared.css';
+import Layout from './component/Layout';
 
 // Home component
 const Home: React.FC = () => {
   return (
-    <div>
-      <h1>Anime Recommendation</h1>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/tv">TV Anime</Link>
-          </li>
-          <li>
-            <Link to="/movie">Movie Anime</Link>
-          </li>
-          <li>
-            <Link to="/mal">MAL-based Recommendation</Link>
-          </li>
-        </ul>
-      </nav>
-    </div>
+    <Layout>
+      <div>
+        <h1>Anime Recommendation</h1>
+      </div>
+    </Layout>
+   
   );
 };
 
