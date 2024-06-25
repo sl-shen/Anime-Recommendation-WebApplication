@@ -16,7 +16,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <li><Link to="/">Home</Link></li>
             <li><Link to="/tv">TV Anime</Link></li>
             <li><Link to="/movie">Movie Anime</Link></li>
-            <li><Link to="/mal">MAL Recommendation</Link></li>
+            <li><Link to="/mal">MAL-Based</Link></li>
           </ul>
         </nav>
         <div className="page-content">
