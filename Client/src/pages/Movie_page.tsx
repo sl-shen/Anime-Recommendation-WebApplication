@@ -51,7 +51,7 @@ const Movie = () => {
 
   return (
     <div>
-      <h1>Movie Anime Recommender</h1>
+      <h2>Movie Anime Recommender</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ position: 'relative' }}>
           <Hint options={suggestions} allowTabFill onHint={() => {}}>

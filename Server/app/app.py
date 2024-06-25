@@ -289,5 +289,165 @@ async def find_similar_animes_movie(anime_name: str, n: int = 10, return_dist: b
     
 
 
+from pydantic import BaseModel
+from typing import Optional, List, Dict
+
+class User(BaseModel):
+    #hash: str
+    #similarity: int
+    username: str
+
+class SimilarUsersResponse(BaseModel):
+    data: list[User]
 
 CLIENT_ID = os.getenv("MAL_CLIENT_ID")
+
+# get_similar_users help func via api
+async def similar_users(username: str, page: int = 1):
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"https://api.reko.moe/{username}/similar", params={"page": page})
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise HTTPException(status_code=response.status_code, detail="Error fetching similar users")
+
+# help func to fetch data
+async def fetch_anime_page(url: str, headers: Dict[str, str], params: Dict[str, str]) -> Dict:
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, params=params, headers=headers)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise HTTPException(status_code=response.status_code, detail=response.text)
+        
+    
+# get user's anime_list via api
+async def user_anime_list(username: str, status: Optional[str] = None) -> List[Dict]:
+    url = f"https://api.myanimelist.net/v2/users/{username}/animelist"
+    params = {
+        "fields": "list_status",
+        "limit": 1000 
+    }
+    if status:
+        params["status"] = status
+    
+    headers = {
+        "X-MAL-CLIENT-ID": CLIENT_ID
+    }
+
+    all_data = []
+    # use loop since mal uses paging for data
+    while url:
+        page_data = await fetch_anime_page(url, headers, params)
+        all_data.extend(page_data['data'])
+        url = page_data['paging'].get('next')
+        params = {}
+
+    return all_data
+
+
+# endpoint to return similar user
+@app.get("/similar-users/{username}")
+async def get_similar_users(username: str, page: int = 1):
+    try:
+        result = await similar_users(username, page)
+        similar_users_response = SimilarUsersResponse(**result)
+        return similar_users_response.data[0] if similar_users_response.data else None
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# endpoint to return user's anime list
+@app.get("/anime-list")
+async def anime_list(username: str, status: Optional[str] = None):
+    try:
+        result = await user_anime_list(username, status)
+        return {"data": result}
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+from statistics import mean
+
+# 
+async def get_anime_recommendations(username: str) -> Dict:
+    try:
+        # 获取输入用户的已完成动漫列表
+        user_anime = await user_anime_list(username, status="completed")
+        
+        # 计算用户的动漫平均评分
+        user_scores = [anime['list_status']['score'] for anime in user_anime if anime['list_status']['score'] > 0]
+        if not user_scores:
+            return {"message": f"用户 {username} 的动漫列表没有评分。"}
+        threshold = mean(user_scores)
+        
+        # 获取用户的已放弃动漫列表
+        user_dropped = await user_anime_list(username, status="dropped")
+        user_dropped_ids = set(anime['node']['id'] for anime in user_dropped)
+        
+         # 获取最相似用户
+        similar_user = await get_similar_users(username)
+        if not similar_user:
+            return {"message": "没有找到相似用户。"}
+        
+        # 检查 similar_user 的类型并相应地获取用户名
+        if isinstance(similar_user, dict):
+            similar_username = similar_user.get('username')
+        elif hasattr(similar_user, 'username'):
+            similar_username = similar_user.username
+        else:
+            similar_username = str(similar_user)
+
+        if not similar_username:
+            return {"message": "无法获取相似用户的用户名。"}
+
+        
+        # 获取相似用户的已完成动漫列表
+        similar_user_anime = await user_anime_list(similar_username, status="completed")
+        if not similar_user_anime:
+            return {"message": f"相似用户 {similar_username} 的动漫列表为空。"}
+        
+        # 过滤掉共同观看的和用户已放弃的动漫
+        user_watched_ids = set(anime['node']['id'] for anime in user_anime)
+        filtered_anime = [
+            anime for anime in similar_user_anime 
+            if anime['node']['id'] not in user_watched_ids 
+            and anime['node']['id'] not in user_dropped_ids 
+            and anime['list_status']['score'] > threshold
+        ]
+        
+        # 按评分排序并选择前5个
+        sorted_anime = sorted(filtered_anime, key=lambda x: x['list_status']['score'], reverse=True)
+        #top_5_anime = sorted_anime[:5]
+        
+        #if not top_5_anime:
+        # return all possible anime recommendations
+        if not sorted_anime:
+            return {"message": "没有可推荐的动漫。"}
+        
+        recommendations = [
+            {
+                "title": anime['node']['title'],
+                "score": anime['list_status']['score']
+            } for anime in sorted_anime
+        ]
+        
+        return {
+            "similar_user": similar_username,
+            "recommendations": recommendations
+        }
+    
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# endpoint to return recommendations
+@app.get("/anime-recommendations/{username}")
+async def anime_recommendations(username: str):
+    return await get_anime_recommendations(username)

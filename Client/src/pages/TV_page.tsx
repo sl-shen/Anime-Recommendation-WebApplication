@@ -51,7 +51,7 @@ const TV = () => {
 
   return (
     <div>
-      <h1>TV Anime Recommender</h1>
+      <h2>TV Anime Recommender</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ position: 'relative' }}>
           <Hint options={suggestions} allowTabFill onHint={() => {}}>
