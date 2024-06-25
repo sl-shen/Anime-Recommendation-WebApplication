@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+const apiUrl = "http://192.168.1.240:8000" //replace with actual url
 
 const AnimeRecommendations = () => {
   const [username, setUsername] = useState('');
@@ -21,7 +22,7 @@ const AnimeRecommendations = () => {
     setDisplayedRecommendations([]);
 
     try {
-      const response = await axios.get(`http://localhost:8000/anime-recommendations/${username}`);
+      const response = await axios.get(`${apiUrl}/anime-recommendations/${username}`);
       setSimilarUser(response.data.similar_user);
       setRecommendations(response.data.recommendations);
       setTotalRecommendations(response.data.recommendations.length);

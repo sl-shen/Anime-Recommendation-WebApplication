@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Hint } from 'react-autocomplete-hint';
 import '../shared.css';
 import Layout from '../component/Layout';
+const apiUrl = "http://192.168.1.240:8000" //replace with actual url
 
 const TV = () => {
   const [animeName, setAnimeName] = useState('');
@@ -19,7 +20,7 @@ const TV = () => {
 
     if (value.length >= 2) {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/autocomplete_tv?term=${encodeURIComponent(value)}`);
+        const response = await axios.get(`${apiUrl}/autocomplete_tv?term=${encodeURIComponent(value)}`);
         setSuggestions(response.data);
         setShowSuggestions(true);
       } catch (error) {
@@ -42,7 +43,7 @@ const TV = () => {
     setError('');
 
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/similar-animes-tv/${animeName}`);
+      const response = await axios.get(`${apiUrl}/similar-animes-tv/${animeName}`);
       setRecommendations(response.data);
     } catch (error) {
       setError('Anime not found. Please try again.');
