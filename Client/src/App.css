@@ -1,26 +1,18 @@
 /* App.css */
 
-body {
-  font-family: 'Roboto', sans-serif;
+body, #root {
   margin: 0;
   padding: 0;
-  color: #333;
-  position: relative;
+  min-height: 100vh;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: url('./image/background_1.jpg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  filter: blur(3px);
-  z-index: -1;
+.page-content {
+  background-color: rgba(255, 255, 255, 0.7); /* 降低不透明度 */
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 800px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .App {

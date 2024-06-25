@@ -5,6 +5,8 @@ import Movie from "./pages/Movie_page";
 import Mal from "./pages/Mal_page";
 import './shared.css';
 import Layout from './component/Layout';
+import { BackgroundProvider } from './component/BackgroundContext';
+import BackgroundManager from './component/BackgroundManager';
 
 // Home component
 const Home: React.FC = () => {
@@ -21,16 +23,18 @@ const Home: React.FC = () => {
 // App component
 const App: React.FC = () => {
   return (
-    <Router>
-      <div>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/tv" element={<TV />} />
-          <Route path="/movie" element={<Movie />} />
-          <Route path="/mal" element={<Mal/>} />
-        </Routes>
-      </div>
-    </Router>
+    <BackgroundProvider>
+      <Router>
+        <BackgroundManager>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/tv" element={<TV />} />
+            <Route path="/movie" element={<Movie />} />
+            <Route path="/mal" element={<Mal/>} />
+          </Routes>
+        </BackgroundManager>
+      </Router>
+    </BackgroundProvider>
   );
 };
 

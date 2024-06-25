@@ -62,7 +62,7 @@ const Movie = () => {
               type="text"
               value={animeName}
               onChange={handleInputChange}
-              placeholder="Enter TV anime name"
+              placeholder="Enter Movie anime name"
             />
           </Hint>
           {showSuggestions && (
