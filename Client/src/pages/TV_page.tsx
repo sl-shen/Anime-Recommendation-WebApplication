@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Hint } from 'react-autocomplete-hint';
 import '../shared.css';
 import Layout from '../component/Layout';
-const apiUrl = "http://192.168.1.240:8000" //replace with actual url
+const apiUrl = "https://kkskapi.yukinolov.com" //replace with actual url
 
 const TV = () => {
   const [animeName, setAnimeName] = useState('');

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-const apiUrl = "http://192.168.1.240:8000" //replace with actual url
+const apiUrl = "https://kkskapi.yukinolov.com" //replace with actual url
 
 const AnimeRecommendations = () => {
   const [username, setUsername] = useState('');

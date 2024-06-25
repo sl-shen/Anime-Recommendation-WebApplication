@@ -23,6 +23,7 @@ app = FastAPI()
 
 
 origins = [
+    "https://kksk.yukinolov.com",
     "http://localhost:5173",
     "localhost:5173",
     "http://localhost",
@@ -30,6 +31,7 @@ origins = [
     "http://localhost:8080",
     "http://192.168.1.240:7979",
     "http://192.168.1.240:8000",
+    "https://kkskapi.yukinolov.com"
 ]
 
 
