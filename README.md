@@ -3,7 +3,7 @@
 This project is an Anime Recommendation System that utilizes a React frontend and a FastAPI backend to provide personalized anime recommendations based on user preferences and MyAnimeList data.
 
 Use the following link to visit the site:
-- [Anime Recommender](kksk.yukinolov.com)
+- [Anime Recommender](https://kksk.yukinolov.com)
 
 ## Tech Stack
 
@@ -18,7 +18,7 @@ Use the following link to visit the site:
 - MAL-based Recommender: Receive personalized recommendations based on your MyAnimeList profile.
 
 The TV and movie anime recommenders are based on machine learning cf model, the model training code is in the following repository:
-- [Anime-Recommendation-Model](github.com/sl-shen/Anime-Recommendation-Model)
+- [Anime-Recommendation-Model](https://github.com/sl-shen/Anime-Recommendation-Model)
 
 The MAL-based recommender retrieves the most similar mal user and recommend anime by comparing the anime lists.
 
